@@ -1,0 +1,198 @@
+# Default values for website.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## Add in 0.8.0 ##
+# To add label into deployment.metadata.labels
+deploymentLabel: []
+# To add label into deployment.spec.template.metadata.labels
+podLabels: []
+
+## End 0.8.0 ##
+
+replicaCount: 1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: ealen/echo-server
+  pullPolicy: IfNotPresent
+  port: 80
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.7.0"
+
+strategy:
+  type: RollingUpdate
+
+terminationGracePeriodSeconds: 30
+
+envs: []
+  # - name: PORT
+  #   value: "80"
+  # - name: APP_ENV
+  #   value: production
+
+vault: 
+  enabled: false
+  role: "app-role"
+  secretPath: "root/data/env/app"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+    scheme: HTTP
+    # httpHeaders:
+    # - name: X-Health-Token
+    #   value: PingMaxiON
+  initialDelaySeconds: 30
+  periodSeconds: 3
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 5
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+    scheme: HTTP
+    # httpHeaders:
+    # - name: X-Health-Token
+    #   value: PingMaxiON
+  initialDelaySeconds: 30
+  periodSeconds: 3
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 3
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+lifecycle:
+  preStop:
+    exec:
+      command: ["sleep", "3"]
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  # customHttpErrors: 404
+    # when the custom-http-errors option is enabled, 
+    # the Ingress controller configures NGINX so that it passes several HTTP headers 
+    # down to its default-backend in case of error
+    # Example usage customHttpErrors: 404,503,false
+  # maxUploadSize: 10m
+    # Sets the maximum allowed size of the client request body
+    # Example usage maxUploadSize: 10m
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 800m
+  #   memory: 1Gi
+  requests:
+    cpu: 32m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+  # targetContainerCPUUtilizationPercentage: 80
+  # targetContainerMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+volumes: []
+  # - name: foo
+  #   configMap:
+  #     name: myconfigmap
+
+affinity: {}
+
+sidecar:
+  enabled: false
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+    port: 80
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+
+  lifecycle: {}
+
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 800m
+    #   memory: 1Gi
+    requests:
+      cpu: 16m
+      memory: 64Mi
+
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: http
+      scheme: HTTP
+    initialDelaySeconds: 30
+    periodSeconds: 3
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 5
+
+  readinessProbe:
+    httpGet:
+      path: /healthz
+      port: http
+      scheme: HTTP
+    initialDelaySeconds: 30
+    periodSeconds: 3
+    timeoutSeconds: 1
+    successThreshold: 1
+    failureThreshold: 3
