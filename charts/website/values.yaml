@@ -38,6 +38,10 @@ vault:
   enabled: false
   role: "app-role"
   secretPath: "root/data/env/app"
+  limitCpu: 128m
+  limitMem: 64Mi
+  requestCpu: 32m
+  requestMem: 32Mi
 
 serviceAccount:
   # Specifies whether a service account should be created

@@ -27,6 +27,10 @@ spec:
         {{- if .Values.vault.enabled }}
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: {{ .Values.vault.role }}
+        vault.hashicorp.com/agent-limits-cpu: {{ .Values.vault.limitCpu }}
+        vault.hashicorp.com/agent-limits-mem: {{ .Values.vault.limitMem }}
+        vault.hashicorp.com/agent-requests-cpu: {{ .Values.vault.requestCpu }}
+        vault.hashicorp.com/agent-requests-mem: {{ .Values.vault.requestMem }}
         vault.hashicorp.com/agent-inject-secret-dotenv: {{ .Values.vault.secretPath }}
         vault.hashicorp.com/agent-inject-template-dotenv: |
           {{ "{{- with secret \"" }}{{ .Values.vault.secretPath }}{{ "\" -}}" }}
