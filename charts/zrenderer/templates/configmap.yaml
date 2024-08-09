@@ -1,0 +1,11 @@
+{{- if .Values.configMap.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "website.fullname" . }}-cfm
+data:
+  {{- range $key, $value := .Values.configMap.configMapData }}
+  {{ $key }}: |
+    {{ $value | nindent 4 }}
+  {{- end }}
+{{- end }}
