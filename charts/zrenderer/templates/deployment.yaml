@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "website.fullname" . }}
+  name: {{ include "zrenderer.fullname" . }}
   labels:
-    {{- include "website.labels" . | nindent 4 }}
+    {{- include "zrenderer.labels" . | nindent 4 }}
     {{- with .Values.deploymentLabel }}
       {{- toYaml . | nindent 4 }}
-    {{- end }}  
+    {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -19,7 +19,7 @@ spec:
 
   selector:
     matchLabels:
-      {{- include "website.selectorLabels" . | nindent 6 }}
+      {{- include "zrenderer.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- if or (.Values.vault.enabled) (.Values.podAnnotations) }}
@@ -31,26 +31,20 @@ spec:
         vault.hashicorp.com/agent-limits-mem: {{ .Values.vault.limitMem }}
         vault.hashicorp.com/agent-requests-cpu: {{ .Values.vault.requestCpu }}
         vault.hashicorp.com/agent-requests-mem: {{ .Values.vault.requestMem }}
-        vault.hashicorp.com/agent-inject-secret-dotenv: {{ .Values.vault.secretPath }}
-        vault.hashicorp.com/agent-inject-secret-dotenv: {{ .Values.vault.secretPath }}
-          {{- if .Values.vault.customTemplate }}
-        vault.hashicorp.com/agent-inject-template-dotenv: |
-          {{- .Values.vault.customTemplate | indent 4 }}
-        {{- else }}
-        vault.hashicorp.com/agent-inject-template-dotenv: |
+        vault.hashicorp.com/agent-inject-secret-zrenderertoken.conf: {{ .Values.vault.secretPath }}
+        vault.hashicorp.com/agent-inject-template-zrenderertoken.conf: |
           {{ "{{- with secret \"" }}{{ .Values.vault.secretPath }}{{ "\" -}}" }}
-          {{ "{{- range $k, $v := .Data.data -}}" }}
-          {{ "{{ $k }}={{ $v }}" }}
-          {{ "{{ end -}}" }}
+          1
+          0,{{ .Data.data.admintoken }},Auto-generated Admin tokens,admin
+          1,{{ .Data.data.usertoken }},{{ .Data.data.admintoken }},createAccessTokens,revokeAccessTokens,modifyAccessTokens,readAccessTokens,readHealth
           {{ "{{- end -}}" }}
-        {{- end }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end -}}
       {{- end }}
       labels:
-        {{- include "website.selectorLabels" . | nindent 8 }}
+        {{- include "zrenderer.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -64,7 +58,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
-      serviceAccountName: {{ include "website.serviceAccountName" . }}
+      serviceAccountName: {{ include "zrenderer.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
 
@@ -83,7 +77,7 @@ spec:
           {{- with .Values.extraContainer }}
           {{- toYaml . | nindent 12 }}
           {{- end }}
-        
+
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
