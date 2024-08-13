@@ -14,6 +14,16 @@ entries:
   zrenderer:
   - apiVersion: v2
     appVersion: 1.20.0
+    created: "2024-08-13T10:49:53.121939327Z"
+    description: A Helm chart for Kubernetes
+    digest: 57fad969cae7f646110aafe87453faa6f4ca2162ee47ceeee4f087a100449daf
+    name: zrenderer
+    type: application
+    urls:
+    - https://github.com/maxion-tech/devops-helm/releases/download/zrenderer-1.0.3/zrenderer-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
+    appVersion: 1.20.0
     created: "2024-08-13T10:43:28.192368183Z"
     description: A Helm chart for Kubernetes
     digest: a6634f8252a29536de429419e40113c9b473854bae2dfbae436711d56a74126b
@@ -42,4 +52,4 @@ entries:
     urls:
     - https://github.com/maxion-tech/devops-helm/releases/download/zrenderer-1.0.0/zrenderer-1.0.0.tgz
     version: 1.0.0
-generated: "2024-08-13T10:43:28.192386106Z"
+generated: "2024-08-13T10:49:53.121959335Z"
