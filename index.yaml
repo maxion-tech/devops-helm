@@ -11,4 +11,15 @@ entries:
     urls:
     - https://github.com/maxion-tech/devops-helm/releases/download/website-1.0.0/website-1.0.0.tgz
     version: 1.0.0
-generated: "2023-07-29T15:10:01.755553788Z"
+  zrenderer:
+  - apiVersion: v2
+    appVersion: 1.20.0
+    created: "2024-08-13T03:56:54.934900621Z"
+    description: A Helm chart for Kubernetes
+    digest: 326e8f1cb67365e6eb286be726ff6b28f48bd4aafc4120d5f93509dce5564115
+    name: zrenderer
+    type: application
+    urls:
+    - https://github.com/maxion-tech/devops-helm/releases/download/zrenderer-1.0.0/zrenderer-1.0.0.tgz
+    version: 1.0.0
+generated: "2024-08-13T03:56:54.934911301Z"
