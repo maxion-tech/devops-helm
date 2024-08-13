@@ -36,7 +36,7 @@ spec:
           {{ "{{- with secret \"" }}{{ .Values.vault.secretPath }}{{ "\" -}}" }}
           1
           0,{{ "{{ .Data.data.admintoken }}" }},Auto-generated Admin Token,admin
-          1,{{ "{{ .Data.data.usertoken }},user
+          1,{{ "{{ .Data.data.usertoken }}" }},user
           {{ "{{ end -}}" }}
         {{- end }}
         {{- with .Values.podAnnotations }}
