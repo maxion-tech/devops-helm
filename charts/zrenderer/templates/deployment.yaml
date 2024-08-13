@@ -35,8 +35,8 @@ spec:
         vault.hashicorp.com/agent-inject-template-zrenderertoken.conf: |
           {{- with secret .Values.vault.secretPath -}}
           1
-          0,{{ .Data.data.admintoken }},Auto-generated Admin tokens,admin
-          1,{{ .Data.data.usertoken }},{{ .Data.data.admintoken }},createAccessTokens,revokeAccessTokens,modifyAccessTokens,readAccessTokens,readHealth
+          0,{{ .Data.admintoken }},Auto-generated Admin tokens,admin
+          1,{{ .Data.usertoken }},{{ .Data.admintoken }},createAccessTokens,revokeAccessTokens,modifyAccessTokens,readAccessTokens,readHealth
           {{- end -}}
         {{- end }}
         {{- with .Values.podAnnotations }}
