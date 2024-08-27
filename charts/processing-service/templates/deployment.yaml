@@ -1,0 +1,188 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "processing-service.fullname" . }}
+  labels:
+    {{- include "processing-service.labels" . | nindent 4 }}
+    {{- with .Values.deploymentLabel }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+
+  {{- with .Values.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+  selector:
+    matchLabels:
+      {{- include "processing-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- if or (.Values.vault.enabled) (.Values.podAnnotations) }}
+      annotations:
+        {{- if .Values.vault.enabled }}
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: {{ .Values.vault.role }}
+        vault.hashicorp.com/agent-limits-cpu: {{ .Values.vault.limitCpu }}
+        vault.hashicorp.com/agent-limits-mem: {{ .Values.vault.limitMem }}
+        vault.hashicorp.com/agent-requests-cpu: {{ .Values.vault.requestCpu }}
+        vault.hashicorp.com/agent-requests-mem: {{ .Values.vault.requestMem }}
+        vault.hashicorp.com/agent-inject-secret-dotenv: {{ .Values.vault.secretPath }}
+        vault.hashicorp.com/agent-inject-template-dotenv: |
+          {{ "{{- with secret \"" }}{{ .Values.vault.secretPath }}{{ "\" -}}" }}
+          {{ "{{- range $k, $v := .Data.data -}}" }}
+          {{ "{{ $k }}={{ $v }}" }}
+          {{ "{{ end -}}" }}
+          {{ "{{- end -}}" }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end -}}
+      {{- end }}
+      labels:
+        {{- include "processing-service.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      serviceAccountName: {{ include "processing-service.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      {{- with .Values.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      containers:
+        {{- with .Values.extraContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+
+        - name: {{ .Chart.Name }}
+          {{- with .Values.extraContainer }}
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          {{- with .Values.envs }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{ end }}
+
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{ end }}
+
+          {{- with .Values.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- if .Values.command }}
+          command:
+            {{- range .Values.command }}
+            - {{ . | quote }}
+            {{- end }}
+          {{- end }}
+
+          {{- if .Values.args }}
+          args:
+            {{- range .Values.args }}
+            - {{ . | quote }}
+            {{- end }}
+          {{- end }}
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.image.port }}
+              protocol: TCP
+
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- if eq .Values.livenessProbe.type "http" }}
+            httpGet:
+              path: {{ .Values.livenessProbe.config.httpGet.path }}
+              port: {{ .Values.livenessProbe.config.httpGet.port }}
+              scheme: {{ .Values.livenessProbe.config.httpGet.scheme }}
+            {{- else if eq .Values.livenessProbe.type "tcp" }}
+            tcpSocket:
+              port: {{ .Values.livenessProbe.config.tcpSocket.port }}
+            {{- else if eq .Values.livenessProbe.type "exec" }}
+            exec:
+              command: {{ .Values.livenessProbe.config.exec.command | toYaml | nindent 12 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.livenessProbe.config.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.config.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.config.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.config.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.config.failureThreshold }}
+          {{- end }}
+
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- if eq .Values.readinessProbe.type "http" }}
+            httpGet:
+              path: {{ .Values.readinessProbe.config.httpGet.path }}
+              port: {{ .Values.readinessProbe.config.httpGet.port }}
+              scheme: {{ .Values.readinessProbe.config.httpGet.scheme }}
+            {{- else if eq .Values.readinessProbe.type "tcp" }}
+            tcpSocket:
+              port: {{ .Values.readinessProbe.config.tcpSocket.port }}
+            {{- else if eq .Values.readinessProbe.type "exec" }}
+            exec:
+              command: {{ .Values.readinessProbe.config.exec.command | toYaml | nindent 12 }}
+            {{- end }}
+            initialDelaySeconds: {{ .Values.readinessProbe.config.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.config.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.config.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.config.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.config.failureThreshold }}
+          {{- end }}
+
+          {{- with .Values.lifecycle }}
+          lifecycle:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
