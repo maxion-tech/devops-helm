@@ -34,7 +34,7 @@ envs: []
   # - name: APP_ENV
   #   value: production
 
-vault: 
+vault:
   enabled: false
   role: "app-role"
   secretPath: "root/data/env/app"
@@ -163,48 +163,3 @@ volumes: []
   #     name: myconfigmap
 
 affinity: {}
-
-sidecar:
-  enabled: false
-  image:
-    repository: nginx
-    pullPolicy: IfNotPresent
-    port: 80
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "latest"
-
-  lifecycle: {}
-
-  resources:
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #   cpu: 800m
-    #   memory: 1Gi
-    requests:
-      cpu: 16m
-      memory: 64Mi
-
-  livenessProbe:
-    httpGet:
-      path: /healthz
-      port: http
-      scheme: HTTP
-    initialDelaySeconds: 30
-    periodSeconds: 3
-    timeoutSeconds: 1
-    successThreshold: 1
-    failureThreshold: 5
-
-  readinessProbe:
-    httpGet:
-      path: /healthz
-      port: http
-      scheme: HTTP
-    initialDelaySeconds: 30
-    periodSeconds: 3
-    timeoutSeconds: 1
-    successThreshold: 1
-    failureThreshold: 3
