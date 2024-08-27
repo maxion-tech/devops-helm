@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "website.fullname" . }}
+  name: {{ include "processing-service.fullname" . }}
   labels:
-    {{- include "website.labels" . | nindent 4 }}
+    {{- include "processing-service.labels" . | nindent 4 }}
     {{- with .Values.deploymentLabel }}
       {{- toYaml . | nindent 4 }}
-    {{- end }}  
+    {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -19,7 +19,7 @@ spec:
 
   selector:
     matchLabels:
-      {{- include "website.selectorLabels" . | nindent 6 }}
+      {{- include "processing-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- if or (.Values.vault.enabled) (.Values.podAnnotations) }}
@@ -44,7 +44,7 @@ spec:
         {{- end -}}
       {{- end }}
       labels:
-        {{- include "website.selectorLabels" . | nindent 8 }}
+        {{- include "processing-service.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -58,7 +58,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
-      serviceAccountName: {{ include "website.serviceAccountName" . }}
+      serviceAccountName: {{ include "processing-service.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
 

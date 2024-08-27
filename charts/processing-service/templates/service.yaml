@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "website.fullname" . }}
+  name: {{ include "processing-service.fullname" . }}
   labels:
-    {{- include "website.labels" . | nindent 4 }}
+    {{- include "processing-service.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "website.selectorLabels" . | nindent 4 }}
+    {{- include "processing-service.selectorLabels" . | nindent 4 }}

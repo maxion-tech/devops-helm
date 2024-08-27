@@ -1,12 +1,12 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "website.fullname" . -}}
+{{- $fullName := include "processing-service.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "website.labels" . | nindent 4 }}
+    {{- include "processing-service.labels" . | nindent 4 }}
   annotations:
     {{- if .Values.ingress.customHttpErrors }}
     nginx.ingress.kubernetes.io/custom-http-errors: {{ .Values.ingress.customHttpErrors -}}
