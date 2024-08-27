@@ -1,5 +1,16 @@
 apiVersion: v1
 entries:
+  processing-service:
+  - apiVersion: v2
+    appVersion: 1.20.0
+    created: "2024-08-27T13:59:18.013231457Z"
+    description: A Helm chart for Kubernetes
+    digest: 34f0e8b57ce5034b122c0b38c98e066051094a281a73b2eafe14ccc0f82c31cf
+    name: processing-service
+    type: application
+    urls:
+    - https://github.com/maxion-tech/devops-helm/releases/download/processing-service-1.0.0/processing-service-1.0.0.tgz
+    version: 1.0.0
   website:
   - apiVersion: v2
     appVersion: 1.20.0
@@ -52,4 +63,4 @@ entries:
     urls:
     - https://github.com/maxion-tech/devops-helm/releases/download/zrenderer-1.0.0/zrenderer-1.0.0.tgz
     version: 1.0.0
-generated: "2024-08-13T10:49:53.121959335Z"
+generated: "2024-08-27T13:59:18.01324892Z"
